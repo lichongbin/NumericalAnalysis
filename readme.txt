@@ -1,0 +1,1 @@
+notes when reading <<Numerical Analysis>> Timothy Sauer
