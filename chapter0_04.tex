@@ -1,0 +1,69 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{enumerate}
+\item \begin{itemize}
+\item[(a)] 
+\begin{align*}
+\frac{1 - \sec x}{\tan^2x} &= \frac{1 - \frac{1}{\cos x}}{\frac{\sin^2 x}{\cos^2 x}} \\
+&= \frac{\cos^2 x - \cos x}{\sin^2 x} \\
+&= -\frac{\cos x(\cos x - 1)}{\cos^2 x - 1} \\
+&= -\frac{\cos x(\cos x - 1)}{(\cos x - 1)(\cos x + 1)} \\
+&= -\frac{\cos x}{\cos x + 1} \\
+&= -\frac{1}{1 + \sec x}
+\end{align*}
+When $x$ is near $2\pi n$, there is subtraction of nearly equal numbers.
+
+\item[(b)] 
+\begin{align*}
+\frac{1 - (1-x)^3}{x} &= \frac{1 - (1 - 3x + 3x^2 - x^3)}{x} \\
+&= \frac{3x - 3x^2 + x^3}{x} \\
+&= 3 - 3x + x^2
+\end{align*}
+When $x$ is near zero, there is subtraction of nearly equal numbers.
+
+\item[(c)]
+\begin{align*}
+\frac{1}{1 + x} - \frac{1}{1 - x} &= \frac{(1 - x) - (1 + x)}{1 - x^2} \\
+&= \frac{2x}{x^2 - 1}
+\end{align*}
+When $x$ is near $\pm1$, there is subtraction of nearly equal numbers.
+
+\end{itemize}
+
+\item 
+\[
+	x = \frac{-3 \pm \sqrt{9 + 4\times8^{-14}}}{2}
+\]
+\[
+	x_1 = \frac{-3 - \sqrt{9 + 4\times8^{-14}}}{2} = -3
+\]
+\[
+	x_2 = \frac{-3 + \sqrt{9 + 4\times8^{-14}}}{2} = 7.57 \times 10^{-14}
+\]
+or
+\[
+	x_2 = \frac{2 \times 8^{-14}}{3 + \sqrt{9 + 4\times8^{-14}}} = 7.58 \times 10^{-14}
+\]
+
+\item 
+\[
+	x_1 = \frac{-b - \sqrt{b^2 + 4 \times 10^{-12}}}{2}
+\]
+\[
+	x_2 = \frac{2 \times 10^{-12}}{-b + \sqrt{b^2 + 4 \times 10^{-12}}}
+\]
+
+\item 
+\begin{align*}
+x_2 &= \frac{-b - \sqrt{b^2 - 4ac}}{2a} \\
+&= \frac{(-b - \sqrt{b^2 - 4ac})((-b + \sqrt{b^2 - 4ac}))}{2a((-b + \sqrt{b^2 - 4ac}))} \\
+&= \frac{b^2 - (b^2 - 4ac)}{2a((-b + \sqrt{b^2 - 4ac}))} \\
+&= \frac{4ac}{2a((-b + \sqrt{b^2 - 4ac}))} \\
+&= \frac{2c}{(-b + \sqrt{b^2 - 4ac})} \\
+\end{align*}
+
+\end{enumerate}
+
+\end{document}
