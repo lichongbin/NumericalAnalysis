@@ -1,0 +1,351 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{enumerate}
+\item \begin{itemize}
+\item[(a)] $f(x) = x^3 - 4x + 1$
+\begin{gather*}
+f(0) = 1 > 0\\
+f(1) = 1 - 4 + 1 = -2 < 0
+\end{gather*}
+so $f(c) = 0$ for some $0 < c < 1$
+
+\item[(b)] $f(x) = 5\cos \pi x - 4$
+\begin{gather*}
+f(0) = 5 - 4= 1 > 0 \\
+f(1) = 5\cos \pi - 4 = -9 < 9
+\end{gather*}
+so $f(c) = 0$ for some $0 < c < 1$
+
+\item[(c)] $f(x) = 8x^4 - 8x^2 + 1$
+\begin{gather*}
+f(0) = 1 > 0 \\
+f(\frac{1}{2}) = 8\frac{1}{16} - 8\frac{1}{4} + 1 = -\frac{1}{2} < 0
+\end{gather*}
+so $f(c) = 0$ for some $0 < c < \frac{1}{2}$
+\end{itemize}
+
+\item \begin{itemize}
+\item[(a)] $f(x) = e^x$ \\
+\begin{gather*}
+	f'(c) = \frac{f(1) - f(0)}{1 - 0} = e - 1 \\
+	e^c = e - 1 \\
+	c = \ln(e-1)
+\end{gather*}
+
+\item[(b)] $f(x) = x^2$ \\
+\begin{gather*}
+f'(x) = 2x \\
+f'(c) = \frac{f(1) - f(0)}{1 - 0} = 1 \\
+2c = 1 \\
+c = \frac{1}{2}
+\end{gather*}
+
+\item[(c)] $f(x) = 1/(x + 1)$ \\
+\begin{gather*}
+f'(x) = -\frac{1}{(x + 1)^2} \\
+f(0) = 1 \\
+f(1) = \frac{1}{2} \\
+f'(c) = \frac{f(1) - f(0)}{1 - 0} = -\frac{1}{2} \\
+-\frac{1}{(c + 1)^2} = -\frac{1}{2} \\
+c = \pm \sqrt 2 - 1
+\end{gather*}
+\end{itemize}
+
+\item \begin{itemize}
+\item[(a)] $f(x) = x$, $g(x) = x$ \\
+\begin{gather*}
+\int_0^1f(x)g(x)dx = \int_0^1x^2dx = \frac{1}{3}x^3|_0^1 = \frac{1}{3} \\
+f(c)\int_0^1g(x)dx = f(c) \int_0^1xdx = \frac{1}{2}f(c)x^2|_0^1 = \frac{1}{2}f(c) \\
+\frac{1}{2}f(c) = \frac{1}{3} \\
+x = \frac{2}{3}
+\end{gather*}
+
+\item[(b)] $f(x) = x^2$, $g(x) = x$ \\
+\begin{gather*}
+\int_0^1f(x)g(x)dx = \int_0^1 x^3 dx = \frac{1}{4}x^4|_0^1 = \frac{1}{4} \\
+f(c) \int_0^1g(x) dx = f(c) \int_0^1 x dx = \frac{1}{2} f(c) x^2 |_0^1 = \frac{1}{2} c^2 \\
+\frac{1}{2} c^2 = \frac{1}{4} \\
+c = \frac{\sqrt 2}{2}
+\end{gather*}
+\item[(c)] $f(x) = x$, $g(x) = e^x$ 
+\begin{align*}
+\int_0^1 f(x) g(x) dx &= \int_0^1 xe^x dx \\
+&= \int_0^1 x d(e^x) \\
+&= xe^x|_0^1 - \int_0^1 e^x dx \\
+&= e - e^x|_0^1 = 1
+\end{align*}
+\begin{align*}
+f(c) \int_0^1 g(x) dx &= c \int_0^1 e^x dx \\
+&= c e^x|_0^1 = c(e-1)
+\end{align*}
+
+\begin{gather*}
+c(e-1) = 1 \\
+c = \frac{1}{e-1}
+\end{gather*}
+
+\end{itemize}
+
+\item \begin{itemize}
+\item[(a)] $f(x) = e^{x^2}$
+\begin{gather*}
+f'(x) = 2xe^{x^2} \\
+f''(x) = 2e^{x^2} + 2x \times 2xe^{x^2} = 2e^{x^2} + 4x^2 e^{x^2} \\
+f^{(3)}(x) = 4xe^{x^2} + 8xe^{x^2} + 4x^2 \times 2xe^{x^2} = (12x + 8x^3)e^{x^2}
+\end{gather*}
+\begin{align*}
+P_2(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 \\
+&= 1 + x^2
+\end{align*}
+The remainder term is:
+\begin{align*}
+\frac{f^{(3)}(c)}{3!} x^3 = \frac{(12c + 8c^3)e^{c^2}}{6} x^3 = (2c + \frac{4}{3}c^3)e^{c^2} x^3
+\end{align*}
+
+\item[(b)] $f(x) = \cos 5x$
+\begin{gather*}
+f'(x) = -5\sin 5x \\
+f''(x) = -25 \cos 5x \\
+f^{(3)}(x) = 125 \sin 5x
+\end{gather*}
+\begin{align*}
+P_2(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!} x^2 \\
+&= 1 + \frac{25}{2}x^2
+\end{align*}
+The remainder term is:
+\begin{align*}
+\frac{f^{(3)}(c)}{3!}x^3 = \frac{125 \sin5c}{6}x^3
+\end{align*}
+
+\item[(c)] $f(x) = 1/(x+1)$
+\begin{gather*}
+f'(x) = -\frac{1}{(x+1)^2} \\
+f''(x) = \frac{2}{(x+1)^3} \\
+f^{(3)}(x) = -\frac{6}{(x+1)^4}
+\end{gather*}
+\begin{align*}
+P_2(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 \\
+&= 1 - x + x^2
+\end{align*}
+The remainder term is:
+\begin{align*}
+\frac{f^{(3)}(c)}{3!} = -\frac{1}{(c+1)^4}x^3
+\end{align*}
+
+\end{itemize}
+
+\item \begin{itemize}
+\item[(a)] $f(x) = e^{x^2}$ 
+\begin{align*}
+f'(x) &= 2xe^{x^2} \\
+f''(x) &= 2e^{x^2} + 2x \times 2xe^{x^2} = (2 + 4x^2) e^{x^2} \\
+f^{(3)}(x) &= 8xe^{x^2} + (2 + 4x^2) \times 2xe^{x^2} = (12x + 8x^3)e^{x^2} \\
+f^{(4)}(x) &= (12 + 24x^2)e^{x^2} + (12x + 8x^3)\times 2xe^{x^2} = (12 + 48x^2 + 16x^4)e^{x^2} \\
+f^{(5)}(x) &= (96x + 64x^3)e^{x^2} + (24x + 96x^3 + 32x^5)e^{x^2} = (120x + 160x^3 + 32x^5)e^{x^2}\\
+f^{(6)}(x) &= (120 + 480x^3 + 160x^4)e^{x^2} + (240x^2 + 320x^4 + 64x^6)e^{x^2} \\
+\end{align*}
+\begin{align*}
+P_5(x) &= f(0) + f'(0)x  + \frac{f''(0)}{2!} x^2 + \frac{f^{(3)}(0)}{3!} x^3 + \frac{f^{(4)}(0)}{4!} x^4 + \frac{f^{(5)}(0)}{5!} x^5 \\
+&= 1 + \frac{2}{2}x^2 + \frac{12}{4!}x^4 \\
+&= 1 + x^2 + \frac{1}{2}x^4
+\end{align*}
+The remainder term is:
+\[
+\frac{f^{(6)}(c)}{6!} x^6
+\]
+
+\item[(b)] $f(x) = \cos 2x$
+\begin{align*}
+f'(x) &= -2 \sin 2x \\
+f''(x) &= -4 \cos 2x \\
+f^{(3)}(x) &= 8 \sin 2x \\
+f^{(4)}(x) &= 16\cos 2x \\
+f^{(5)}(x) &= -32 \sin 2x \\
+f^{(6)}(x) &= -64 \cos 2x
+\end{align*}
+\begin{align*}
+P_5(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!} x^2 + \frac{f^{(3)}(0)}{3!} x^3 + \frac{f^{(4)}(0)}{4!} x^4 + \frac{f^{(5)}(0)}{5!} x^5 \\
+&= 1 - \frac{4}{2!}x^2 + \frac{16}{4!}x^4 \\
+&= 1 - 2x^2 + \frac{2}{3}x^4
+\end{align*}
+The remainder term is:
+\begin{align*}
+\frac{f^{(6)}(c)}{6!}x^6
+\end{align*}
+
+\item[(c)] $f(x) = \ln(1 + x)$
+\begin{align*}
+f'(x) &= \frac{1}{1 + x} \\
+f''(x) &= -\frac{1}{(1+x)^2} \\
+f^{(3)}(x) &= \frac{2}{(1+x)^3} \\
+f^{(4)}(x) &= -\frac{6}{(1+x)^4} \\
+f^{(5)}(x) &= \frac{24}{(1+x)^5}\\
+f^{(6)}(x) &= - \frac{120}{(1+x)^6}
+\end{align*}
+\begin{align*}
+P_5(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 + \frac{f^{(3)}(0)}{3!} x^3 + \frac{f^{(4)}(0)}{4!} x^4 + \frac{f^{(5)}(0)}{5!} x^5 \\
+&= x - \frac{1}{2}x^2 + \frac{1}{3}x^3 - \frac{1}{4}x^4 + \frac{1}{5}x^5
+\end{align*}
+The remainder term is:
+\[
+	\frac{f^{(6)}(c)}{6!}x^6
+\]
+
+\item[(d)] $f(x) = \sin^2 x$
+\begin{align*}
+f'(x) &= 2 \sin x \cos x = \sin 2x \\
+f''(x) &= 2 \cos 2x \\
+f^{(3)} (x) &= -4 \sin 2x \\
+f^{(4)} (x) &= -8 \cos 2x \\
+f^{(5)} (x) &= 16 \sin 2x \\
+f^{(6)} (x) &= 32 \cos 2x
+\end{align*}
+\begin{align*}
+P_5(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 + \frac{f^{(3)}(0)}{3!} x^3 + \frac{f^{(4)}(0)}{4!} x^4 + \frac{f^{(5)}(0)}{5!} x^5 \\
+&= x^2 - \frac{1}{3}x^4
+\end{align*}
+The remainder term is:
+\[
+	\frac{f^{(6)}(c)}{6!} x^6
+\]
+
+\end{itemize}
+
+\item \begin{itemize}
+\item[(a)] $f(x) = x^{-2}$
+\begin{align*}
+f'(x) &= -2x^{-3} \\
+f''(x) &= 6x^{-4} \\
+f^{(3)}(x) &= -24x^{-5} \\
+f^{(4)}(x) &= 120x^{-6}
+\end{align*}
+\begin{align*}
+P_4(x) &= f(1) + f'(1)(x - 1) + \frac{f''(1)}{2!}(x - 1)^2 + \frac{f^{(3)}(1)}{3!}(x - 1)^3 + \frac{f^{(4)}(1)}{4!}(x - 1)^4 \\
+&= 1 - 2(x - 1) + 3(x - 1)^2 - 4(x - 1)^3 + 5(x - 1)^4
+\end{align*}
+The remainder term is:
+\[
+	\frac{f^{(5)}(c)}{5!}(x - 1)^5 = -6c^{-7}(x - 1)^5
+\]
+
+\item[(b)]
+\begin{align*}
+f(0.9) &= 1 + 0.2 + 0.03 + 0.004 + 0.0005 = 1.2345 \\
+f(1.1) &= 1 - 0.2 + 0.03 - 0.004 + 0.0005 = 0.8265
+\end{align*}
+
+\item[(c)]
+if $x = 0.9$, the error bound is:
+\[
+	-6c^{-7}(x - 1)^5 = 0.00012545
+\]
+if $x = 1.1$, the error bound is:
+\[
+	-6c^{-7}(x - 1)^5 = 0.00006
+\]
+
+\item[(d)] $f(0.9) = 1.2345679012345679012345679012346$\\
+$1.2345679012345679012345679012346 - 1.2345 = 0.00006790123$ \\
+$f(1.1) = 0.8264462809917355371900826446281$ \\
+$0.8264462809917355371900826446281 - 0.8265 = 0.000053719$
+\end{itemize}
+
+\item $f(x) = \ln x$
+\begin{itemize}
+\item[(a)] 
+\begin{align*}
+f'(x) &= x^{-1} \\
+f''(x) &= -x^{-2} \\
+f^{(3)}(x) &= 2x^{-3} \\
+f^{(4)}(x) &= -6x^{-4} \\
+f^{(5)}(x) &= 24x^{-5}
+\end{align*}
+\begin{align*}
+P_4(x) &= f(1) + f'(1)(x - 1) + \frac{f''(1)}{2!}(x - 1)^2 + \frac{f^{(3)}(1)}{3!}(x - 1)^3 + \frac{f^{(4)}(1)}{4!}(x - 1)^4 \\
+&= (x - 1) - \frac{1}{2}(x - 1)^2 + \frac{1}{3}(x - 1)^3 - \frac{1}{4}(x - 1)^4
+\end{align*}
+The remainder term is:
+\[
+	\frac{f^{(5)}(c)}{5!}(x - 1)^5 = \frac{24}{5!}c^{-5}(x - 1)^5 = 0.2c^{-5}(x - 1)^5
+\]
+
+\item[(b)]
+\begin{align*}
+f(0.9) &= -0.1 - 0.005 - 0.0003333 - 0.000025 = -0.10535833333\\
+f(1.1) &= 0.1 - 0.005 + 0.00033333 - 0.000025 = 0.0953083
+\end{align*}
+
+\item[(c)]
+if $x = 0.9$, the error bound is:
+\[
+	0.2c^{-5}(x - 1)^5 = -0.000002c^{-5} = 0.000003387
+\]
+if $x = 0.9$, the error bound is:
+\[
+	0.2c^{-5}(x - 1)^5 = -0.000002c^{-5} = 0.000002
+\]
+
+\item[(d)]
+$f(0.9) = -0.10536051565782630122750098083931$ \\
+$-0.10536051565782630122750098083931 + 0.10535833333 = -0.0000021823$ \\
+$f(1.1) = 0.09531017980432486004395212328077$ \\
+$0.09531017980432486004395212328077 - 0.0953083 = 0.0000018798$
+\end{itemize}
+
+\item \begin{itemize}
+\item[(a)] $f(x) = \cos x$
+\begin{align*}
+f'(x) &= -\sin x \\
+f''(x) &= -\cos x \\
+f^{(3)}(x) &= \sin x \\
+f^{(4)}(x) &= \cos x \\
+f^{(5)}(x) &= -\sin x \\
+f^{(6)}(x) &= -\cos x
+\end{align*}
+
+\begin{align*}
+P_5(x) &= f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 + \frac{f^{(3)}(0)}{3!}x^3 + \frac{f^{(4)}(0)}{4!}x^4 + \frac{f^{(5)}(0)}{5!}x^5
+\end{align*}
+The remainder term is:
+\[
+	\frac{f^{(6)}(c)}{6!}x^6
+\]
+
+\item[(b)] $x \in [-\pi/4, \pi/4]$
+the upper bound for the error is: 
+\[
+	\frac{f^{(6)}(c)}{6!}x^6 = 	\frac{\cos(c)}{6!}(\frac{\pi}{4})^6	< \frac{\pi^6}{6! \times 4^6}
+\]
+\end{itemize}
+
+\item $f(x) = \sqrt{x+1}$
+\begin{align*}
+	f'(x) = \frac{1}{2\sqrt{x+1}} \\
+	f''(x) = -\frac{1}{4}(x+1)^{-\frac{3}{2}}
+\end{align*}
+
+\begin{align*}
+P_1(x) &= f(0) + f'(0)x \\
+&= 1 + \frac{1}{2}x
+\end{align*}
+the remainder term is:
+\[
+	\frac{f''(c)}{2!}x^2
+\]
+
+if $x = 0.02$
+\begin{align*}
+	\frac{f''(c)}{2!}x^2 = -\frac{1}{4}(c+1)^{-\frac{3}{2}} \times \frac{1}{2} \times 0.0004 = 0.00005(c+1)^{-\frac{3}{2}}
+\end{align*}
+
+\begin{gather*}
+	\sqrt{1.02} = 1.009950493836208 \\
+	P_1(0.02) = 1 + \frac{1}{2} \times 0.02 = 1.01 \\
+	1.01 - 1.009950493836208 = 0.0000495
+\end{gather*}
+
+\end{enumerate}
+
+\end{document}
