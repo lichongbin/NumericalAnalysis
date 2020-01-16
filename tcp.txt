@@ -1,0 +1,1076 @@
+Resource.h
+
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ 生成的包含文件。
+// 供 KISSHProject.rc 使用
+//
+#define IDM_ABOUTBOX                    0x0010
+#define IDD_ABOUTBOX                    100
+#define IDS_ABOUTBOX                    101
+#define IDD_KISSHPROJECT_DIALOG         102
+#define IDP_SOCKETS_INIT_FAILED         103
+#define IDR_MAINFRAME                   128
+#define IDD_DIALOG_DEVICE_ADDR          130
+#define IDS_CONNECT_FAILED              131
+#define IDS_CONNECT_SUCCESS             132
+#define IDS_BTN_CONNECT                 133
+#define IDS_BTN_DISCONNECT              134
+#define IDS_DISCONNECTED                135
+#define IDC_BUTTON_SEND                 1000
+#define IDC_BUTTON_CONNECT              1001
+#define IDC_IPADDRESS_DEVICE            1002
+#define IDC_EDIT_DEVICE_PORT            1003
+#define IDC_EDIT1                       1004
+#define IDC_EDIT_SEND                   1004
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif
+
+
+
+UserMsg.h
+
+#pragma once
+
+//WPARAM:
+// 0 --- success
+// 1 --- failed
+#define WM_CONNECT        WM_USER+1
+
+#define WM_DISCONNECT     WM_USER+2
+
+
+KISSHProjectDlg.h
+
+// KISSHProjectDlg.h: 头文件
+//
+
+#pragma once
+
+
+// CKISSHProjectDlg 对话框
+class CKISSHProjectDlg : public CDialogEx
+{
+// 构造
+public:
+	CKISSHProjectDlg(CWnd* pParent = nullptr);	// 标准构造函数
+
+// 对话框数据
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_KISSHPROJECT_DIALOG };
+#endif
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
+
+
+// 实现
+protected:
+	HICON m_hIcon;
+
+	// 生成的消息映射函数
+	virtual BOOL OnInitDialog();
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnPaint();
+	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnBnClickedButtonSend();
+	afx_msg void OnBnClickedButtonConnect();
+	afx_msg void OnClose();
+	afx_msg LRESULT OnConnected(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDisconnect(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	DECLARE_MESSAGE_MAP()
+
+public:
+	HANDLE m_hEvtConnect;
+	CWinThread* m_pThrdConnect;
+
+	deque<BYTE> m_SendBuf;
+	HANDLE m_hEvtSend, m_hExitSend;
+	CCriticalSection m_SendCS;
+	CWinThread* m_pThrdSend;
+
+	deque<BYTE> m_RecvBuf;
+	HANDLE m_hEvtRecv, m_hExitRecv;
+	CCriticalSection m_RecvCS;
+	CWinThread* m_pThrdRecv;
+
+	static UINT DoConnect(LPVOID lpParam);
+	static UINT TcpSend(LPVOID lpParam);
+	static UINT TcpRecv(LPVOID lpParam);
+	static bool Send(SOCKET sock, WSAEVENT hEvent, BYTE* pBuf, int nBufSize, int &nOffset);
+
+	void CleanSocket();
+
+	SOCKET  m_sock;
+	CButton m_btnConnect;
+	UINT_PTR m_nQuery;
+	afx_msg void OnEnChangeEdit1();
+	CEdit m_edSend;
+};
+
+
+KISSHProjectDlg.cpp
+
+
+
+// KISSHProjectDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "framework.h"
+#include "KISSHProject.h"
+#include "KISSHProjectDlg.h"
+#include "afxdialogex.h"
+#include "DeviceAddressWnd.h"
+#include "Settings.h"
+#include "UserMsg.h"
+
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+
+// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
+
+class CAboutDlg : public CDialogEx
+{
+public:
+	CAboutDlg();
+
+	// 对话框数据
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_ABOUTBOX };
+#endif
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+
+// 实现
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
+{
+}
+
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+
+// CKISSHProjectDlg 对话框
+
+
+
+CKISSHProjectDlg::CKISSHProjectDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_KISSHPROJECT_DIALOG, pParent)
+{
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_hEvtConnect = NULL;
+	m_pThrdConnect = nullptr;
+
+	m_hEvtSend = NULL;
+	m_hExitSend = NULL;
+	m_pThrdSend = nullptr;
+
+	m_hEvtRecv = NULL;
+	m_hExitRecv = NULL;
+	m_pThrdRecv = nullptr;
+
+	m_sock = INVALID_SOCKET;
+}
+
+
+void CKISSHProjectDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_BUTTON_CONNECT, m_btnConnect);
+	DDX_Control(pDX, IDC_EDIT_SEND, m_edSend);
+}
+
+
+BEGIN_MESSAGE_MAP(CKISSHProjectDlg, CDialogEx)
+	ON_WM_SYSCOMMAND()
+	ON_WM_PAINT()
+	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_SEND, &CKISSHProjectDlg::OnBnClickedButtonSend)
+	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CKISSHProjectDlg::OnBnClickedButtonConnect)
+	ON_WM_CLOSE()
+	ON_MESSAGE(WM_CONNECT, &CKISSHProjectDlg::OnConnected)
+	ON_MESSAGE(WM_DISCONNECT, &CKISSHProjectDlg::OnDisconnect)
+	ON_WM_TIMER()
+	ON_EN_CHANGE(IDC_EDIT1, &CKISSHProjectDlg::OnEnChangeEdit1)
+END_MESSAGE_MAP()
+
+
+// CKISSHProjectDlg 消息处理程序
+BOOL CKISSHProjectDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// 将“关于...”菜单项添加到系统菜单中。
+
+	// IDM_ABOUTBOX 必须在系统命令范围内。
+	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	ASSERT(IDM_ABOUTBOX < 0xF000);
+
+	CMenu* pSysMenu = GetSystemMenu(FALSE);
+	if (pSysMenu != nullptr)
+	{
+		BOOL bNameValid;
+		CString strAboutMenu;
+		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+		ASSERT(bNameValid);
+		if (!strAboutMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+	}
+
+	// 设置此对话框的图标。  当应用程序主窗口不是对话框时，框架将自动
+	//  执行此操作
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
+
+	// TODO: 在此添加额外的初始化代码
+
+	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+
+void CKISSHProjectDlg::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	{
+		CAboutDlg dlgAbout;
+		dlgAbout.DoModal();
+	}
+	else
+	{
+		CDialogEx::OnSysCommand(nID, lParam);
+	}
+}
+
+// 如果向对话框添加最小化按钮，则需要下面的代码
+//  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
+//  这将由框架自动完成。
+
+void CKISSHProjectDlg::OnPaint()
+{
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // 用于绘制的设备上下文
+
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// 使图标在工作区矩形中居中
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// 绘制图标
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		CDialogEx::OnPaint();
+	}
+}
+
+//当用户拖动最小化窗口时系统调用此函数取得光标
+//显示。
+HCURSOR CKISSHProjectDlg::OnQueryDragIcon()
+{
+	return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+void CKISSHProjectDlg::OnBnClickedButtonSend()
+{
+	if (m_sock != INVALID_SOCKET)
+	{
+		CString s;
+		m_edSend.GetWindowText(s);
+		if (s.GetLength() > 0)
+		{
+			m_SendCS.Lock();
+
+			for (int i = 0; i < s.GetLength(); i++)
+			{
+				m_SendBuf.push_back(char(s.GetAt(i)));
+			}
+
+			m_SendCS.Unlock();
+			SetEvent(m_hEvtSend);
+		}
+	}
+}
+
+
+void CKISSHProjectDlg::OnBnClickedButtonConnect()
+{
+	if (m_pThrdConnect != nullptr)
+	{
+		return;
+	}
+
+	if (m_sock != INVALID_SOCKET)
+	{
+		CleanSocket();
+		CString s;
+		s.LoadString(IDS_BTN_CONNECT);
+		m_btnConnect.SetWindowText(s);
+	}
+	else
+	{
+		DeviceAddressWnd dlg(this);
+		if (dlg.DoModal() == IDOK)
+		{
+			m_hEvtConnect = CreateEvent(NULL, TRUE, FALSE, NULL);
+			m_pThrdConnect = AfxBeginThread(DoConnect, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+			if (nullptr == m_pThrdConnect)
+			{
+				return;
+			}
+			m_pThrdConnect->m_bAutoDelete = FALSE;
+			m_pThrdConnect->ResumeThread();
+		}
+	}
+}
+
+
+UINT CKISSHProjectDlg::DoConnect(LPVOID lpParam)
+{
+	CKISSHProjectDlg* pWnd = (CKISSHProjectDlg*)lpParam;
+	if (nullptr == pWnd)
+	{
+		return 0;
+	}
+
+	SOCKET& sock = pWnd->m_sock;
+	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (INVALID_SOCKET == sock)
+	{
+		return false;
+	}
+
+	Settings ss;
+
+	SOCKADDR_IN sockAddr;
+	memset(&sockAddr, 0, sizeof(sockAddr));
+	sockAddr.sin_family = AF_INET;
+	sockAddr.sin_addr.s_addr = htonl(ss.m_dwIP);
+	sockAddr.sin_port = htons(ss.m_nPort);
+
+	bool bConnected = false;
+
+	// 设置为非阻塞模式
+	//u_long mode = 1;
+	//ioctlsocket(m_sock, FIONBIO, &mode);
+	WSAEVENT hEvent = WSACreateEvent();
+	if (WSAEventSelect(sock, hEvent, FD_CONNECT | FD_CLOSE) != SOCKET_ERROR)
+	{
+		int ret = connect(sock, (SOCKADDR*)&sockAddr, sizeof(sockAddr));
+		if (ret != 0 && WSAGetLastError() == WSAEWOULDBLOCK)
+		{
+			DWORD cEvents = 0;
+			WSAEVENT EventArray[32] = { 0 };
+			EventArray[cEvents++] = hEvent;
+			DWORD retval = WSAWaitForMultipleEvents(cEvents, EventArray, TRUE, 3000, FALSE);
+			if (retval == WSA_WAIT_IO_COMPLETION)
+			{
+				bConnected = false;
+			}
+			else if (retval == WSA_WAIT_TIMEOUT)
+			{
+				bConnected = false;
+			}
+			else
+			{
+				WSANETWORKEVENTS event;
+				WSAEnumNetworkEvents(sock, hEvent, &event);
+				if (event.lNetworkEvents & FD_CONNECT)
+				{
+					if (event.iErrorCode[FD_CONNECT_BIT] == 0)
+					{
+						bConnected = true;
+					}
+					else
+					{
+						bConnected = false;
+					}
+				}
+				else if (event.lNetworkEvents & FD_CLOSE)
+				{
+					bConnected = false;
+				}
+			}
+		}
+		else if (ret == 0)
+		{
+			bConnected = true;
+		}
+		else
+		{
+			bConnected = false;
+		}
+	}
+
+
+	WSACloseEvent(hEvent);
+	if (!bConnected)
+	{
+		closesocket(sock);
+		sock = INVALID_SOCKET;
+	}
+
+	pWnd->PostMessage(WM_CONNECT, bConnected ? 0 : 1, 0);
+	return true;
+}
+
+
+UINT CKISSHProjectDlg::TcpSend(LPVOID lpParam)
+{
+	CKISSHProjectDlg* pWnd = (CKISSHProjectDlg*)lpParam;
+	if (nullptr == pWnd)
+	{
+		return 0;
+	}
+
+	HANDLE& hSend = pWnd->m_hEvtSend;
+	HANDLE& hExit = pWnd->m_hExitSend;
+	CCriticalSection& cs = pWnd->m_SendCS;
+	deque<BYTE>& buf = pWnd->m_SendBuf;
+	SOCKET& sock = pWnd->m_sock;
+
+	BYTE* pBuf = nullptr;
+	int nBufSize = 0, nOffset = 0;
+
+	WSAEVENT hEvent = WSACreateEvent();
+	WSAEventSelect(sock, hEvent, FD_WRITE | FD_CLOSE);
+
+	while (true)
+	{
+		HANDLE hEventArray[8] = { NULL };
+		DWORD dwEventCount = 0;
+
+		hEventArray[dwEventCount++] = hSend;
+		hEventArray[dwEventCount++] = hExit;
+		DWORD dwRet = WaitForMultipleObjects(dwEventCount, hEventArray, FALSE, INFINITE);
+		if (dwRet == WAIT_TIMEOUT)
+		{
+			break;
+		}
+		else if (dwRet == WAIT_FAILED)
+		{
+			break;
+		}
+		else if (dwRet == WAIT_OBJECT_0)
+		{
+			if (nOffset == nBufSize)
+			{
+				cs.Lock();
+
+				int ss = int(buf.size());
+				if (ss > 0)
+				{
+					if (pBuf != nullptr)
+					{
+						delete[] pBuf;
+					}
+					nBufSize = ss;
+					pBuf = new BYTE[nBufSize];
+
+					for (int i = 0; i < ss; i++)
+					{
+						pBuf[i] = buf[0];
+						buf.pop_front();
+					}
+
+					nOffset = 0;
+				}
+
+				cs.Unlock();
+
+				ResetEvent(hSend);
+			}
+		}
+		else if (dwRet == (WAIT_OBJECT_0 + 1))
+		{
+			break;
+		}
+
+		if (!Send(sock, hEvent, pBuf, nBufSize, nOffset))
+		{
+			pWnd->PostMessage(WM_DISCONNECT);
+			break;
+		}
+
+		if (nOffset < nBufSize)
+		{
+			DWORD cEvents = 0;
+			WSAEVENT EventArray[32] = { 0 };
+			EventArray[cEvents++] = hEvent;
+			EventArray[cEvents++] = hExit;
+			DWORD retval = WSAWaitForMultipleEvents(cEvents, EventArray, FALSE, INFINITE, FALSE);
+			if (retval == WSA_WAIT_IO_COMPLETION)
+			{
+				pWnd->PostMessage(WM_DISCONNECT);
+				break;
+			}
+			else if (retval == WSA_WAIT_TIMEOUT)
+			{
+				pWnd->PostMessage(WM_DISCONNECT);
+				break;
+			}
+			else
+			{
+				WSANETWORKEVENTS event;
+				WSAEnumNetworkEvents(sock, hEvent, &event);
+				if (event.lNetworkEvents & FD_WRITE)
+				{
+				}
+				else if (event.lNetworkEvents & FD_CLOSE)
+				{
+					pWnd->PostMessage(WM_DISCONNECT);
+					break;
+				}
+			}
+		}
+	}
+
+	WSACloseEvent(hEvent);
+
+	if (pBuf != nullptr && nBufSize > 0)
+	{
+		delete[] pBuf;
+		pBuf = nullptr;
+		nBufSize = 0;
+	}
+
+	return 0;
+}
+
+
+bool CKISSHProjectDlg::Send(SOCKET sock, WSAEVENT hEvent, BYTE* pBuf, int nBufSize, int& nOffset)
+{
+	int nSend = send(sock, (char*)pBuf + nOffset, nBufSize - nOffset, 0);
+	if (0 == nSend)
+	{
+		false;
+	}
+
+	if (SOCKET_ERROR == nSend)
+	{
+		if (WSAEWOULDBLOCK != WSAGetLastError())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	nOffset += nSend;
+	return true;
+}
+
+
+UINT CKISSHProjectDlg::TcpRecv(LPVOID lpParam)
+{
+	CKISSHProjectDlg* pWnd = (CKISSHProjectDlg*)lpParam;
+	if (nullptr == pWnd)
+	{
+		return 0;
+	}
+
+	HANDLE& hRecv = pWnd->m_hEvtRecv;
+	HANDLE& hExit = pWnd->m_hExitRecv;
+	CCriticalSection& cs = pWnd->m_RecvCS;
+	deque<BYTE>& buf = pWnd->m_RecvBuf;
+	SOCKET& sock = pWnd->m_sock;
+
+	const int nBufSize = 1024;
+	char* pBuf = new char[nBufSize];
+
+	WSAEVENT hEvent = WSACreateEvent();
+	WSAEventSelect(sock, hEvent, FD_READ | FD_CLOSE);
+
+	while (true)
+	{
+		DWORD cEvents = 0;
+		WSAEVENT EventArray[32] = { 0 };
+		EventArray[cEvents++] = hEvent;
+		EventArray[cEvents++] = hExit;
+		DWORD retval = WSAWaitForMultipleEvents(cEvents, EventArray, FALSE, INFINITE, FALSE);
+		if (retval == WSA_WAIT_IO_COMPLETION)
+		{
+			break;
+		}
+		else if (retval == WSA_WAIT_TIMEOUT)
+		{
+			break;
+		}
+		else if (retval == WAIT_OBJECT_0)
+		{
+			WSANETWORKEVENTS event;
+			WSAEnumNetworkEvents(sock, hEvent, &event);
+			if (event.lNetworkEvents & FD_READ)
+			{
+				if (event.iErrorCode[FD_READ_BIT] == 0)
+				{
+					int nRead = recv(sock, pBuf, nBufSize, 0);
+					if (nRead > 0)
+					{
+						cs.Lock();
+						for (int i = 0; i < nRead; i++)
+						{
+							buf.push_back(pBuf[i]);
+						}
+						cs.Unlock();
+					}
+					else
+					{
+						pWnd->PostMessage(WM_DISCONNECT);
+						break;
+					}
+				}
+			}
+			else if (event.lNetworkEvents & FD_CLOSE)
+			{
+				pWnd->PostMessage(WM_DISCONNECT);
+				break;
+			}
+		}
+		else if (retval == (WAIT_OBJECT_0 + 1))
+		{
+			break;
+		}
+	}
+
+	WSACloseEvent(hEvent);
+
+	if (pBuf != nullptr)
+	{
+		delete[] pBuf;
+		pBuf = nullptr;
+	}
+
+	return 0;
+}
+
+
+void CKISSHProjectDlg::CleanSocket()
+{
+	if (INVALID_SOCKET == m_sock)
+	{
+		return;
+	}
+
+	KillTimer(m_nQuery);
+
+	if (m_pThrdRecv != nullptr)
+	{
+		SetEvent(m_hExitRecv);
+		if (WaitForSingleObject(m_pThrdRecv->m_hThread, INFINITE) == WAIT_OBJECT_0)
+		{
+			delete m_pThrdRecv;
+			m_pThrdRecv = nullptr;
+		}
+	}
+
+	if (m_pThrdSend != nullptr)
+	{
+		SetEvent(m_hExitSend);
+		if (WaitForSingleObject(m_pThrdSend->m_hThread, INFINITE) == WAIT_OBJECT_0)
+		{
+			delete m_pThrdSend;
+			m_pThrdSend = nullptr;
+		}
+	}
+
+	closesocket(m_sock);
+	m_sock = INVALID_SOCKET;
+}
+
+
+void CKISSHProjectDlg::OnClose()
+{
+	CleanSocket();
+	CDialogEx::OnClose();
+}
+
+
+LRESULT CKISSHProjectDlg::OnConnected(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam == 0)
+	{
+		// send thread
+		m_hEvtSend = CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_hExitSend = CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_pThrdSend = AfxBeginThread(TcpSend, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+		if (nullptr == m_pThrdSend)
+		{
+			return 0;
+		}
+		m_pThrdSend->m_bAutoDelete = FALSE;
+		m_pThrdSend->ResumeThread();
+
+		// receive thread
+		m_hEvtRecv = CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_hExitRecv = CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_pThrdRecv = AfxBeginThread(TcpRecv, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+		if (nullptr == m_pThrdRecv)
+		{
+			return 0;
+		}
+		m_pThrdRecv->m_bAutoDelete = FALSE;
+		m_pThrdRecv->ResumeThread();
+
+		m_nQuery = SetTimer(1001, 500, NULL);
+
+		CString s;
+		s.LoadString(IDS_BTN_DISCONNECT);
+		m_btnConnect.SetWindowText(s);
+		AfxMessageBox(IDS_CONNECT_SUCCESS);
+	}
+	else
+	{
+		AfxMessageBox(IDS_CONNECT_FAILED);
+	}
+
+
+	if (WaitForSingleObject(m_pThrdConnect->m_hThread, INFINITE) == WAIT_OBJECT_0)
+	{
+		delete m_pThrdConnect;
+		m_pThrdConnect = nullptr;
+	}
+	return 0;
+}
+
+
+
+LRESULT CKISSHProjectDlg::OnDisconnect(WPARAM wParam, LPARAM lParam)
+{
+	CleanSocket();
+	AfxMessageBox(IDS_DISCONNECTED);
+	return 0;
+}
+
+
+
+void CKISSHProjectDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == m_nQuery)
+	{
+		vector<BYTE> data;
+		m_RecvCS.Lock();
+		for (size_t i = 0; i < m_RecvBuf.size(); i++)
+		{
+			data.push_back(m_RecvBuf[0]);
+			m_RecvBuf.pop_front();
+		}
+		m_RecvCS.Unlock();
+
+		if (data.size() > 0)
+		{
+			CString str;
+			for (size_t i = 0; i < data.size(); i++)
+			{
+				CString s;
+				s.Format(_T("%c "), data[i]);
+				str.Append(s);
+			}
+			AfxMessageBox(str);
+		}
+	}
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CKISSHProjectDlg::OnEnChangeEdit1()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+KISSHProject.rc
+
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+#include "verrsrc.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "#include ""verrsrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#include ""res\\KISSHProject.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
+    "#if !defined(_AFXDLL)\r\n"
+    "#include ""l.CHS\\afxribbon.rc""   // MFC 功能区和控制条资源\r\n"
+    "#endif\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\KISSHProject.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 KISSHProject"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    LTEXT           "KISSHProject，版本 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "版权所有 (C) 2020",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_KISSHPROJECT_DIALOG DIALOGEX 0, 0, 412, 296
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,301,278,50,14
+    PUSHBUTTON      "取消",IDCANCEL,358,278,50,14
+    PUSHBUTTON      "执行",IDC_BUTTON_SEND,149,102,50,14
+    PUSHBUTTON      "连接",IDC_BUTTON_CONNECT,4,278,50,14
+    EDITTEXT        IDC_EDIT_SEND,4,102,135,15,ES_AUTOHSCROLL
+END
+
+IDD_DIALOG_DEVICE_ADDR DIALOGEX 0, 0, 219, 91
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "连接"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,49,73,50,14
+    PUSHBUTTON      "取消",IDCANCEL,120,73,50,14
+    LTEXT           "地址",IDC_STATIC,31,22,17,8
+    LTEXT           "端口",IDC_STATIC,31,44,17,8
+    CONTROL         "",IDC_IPADDRESS_DEVICE,"SysIPAddress32",WS_TABSTOP,57,19,100,15
+    EDITTEXT        IDC_EDIT_DEVICE_PORT,57,42,40,14,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "KISSHProject"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "KISSHProject.exe"
+            VALUE "LegalCopyright", "TODO:  (C) <公司名>。  保留所有权利。"
+            VALUE "OriginalFilename", "KISSHProject.exe"
+            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_KISSHPROJECT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 408
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 292
+    END
+
+    IDD_DIALOG_DEVICE_ADDR, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 215
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 87
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_KISSHPROJECT_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_DEVICE_ADDR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "关于 KISSHProject(&A)..."
+    IDP_SOCKETS_INIT_FAILED "Windows 套接字初始化失败。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CONNECT_FAILED      "连接失败！"
+    IDS_CONNECT_SUCCESS     "连接成功！"
+    IDS_BTN_CONNECT         "连接"
+    IDS_BTN_DISCONNECT      "断开"
+	IDS_DISCONNECTED        "连接已经断开！"
+END
+
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#include "res\KISSHProject.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "l.CHS\afxres.rc"      // 标准组件
+#if !defined(_AFXDLL)
+#include "l.CHS\afxribbon.rc"   // MFC 功能区和控制条资源
+#endif
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
