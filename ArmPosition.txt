@@ -1,0 +1,53 @@
+#pragma once
+
+class ArmPosition
+{
+public:
+	ArmPosition();
+	ArmPosition(int x, int y, int z);
+	ArmPosition(const ArmPosition& other);
+	~ArmPosition();
+
+	ArmPosition& operator=(const ArmPosition& other);
+
+	int m_x, m_y, m_z;
+};
+
+
+
+#include "pch.h"
+#include "ArmPosition.h"
+
+
+ArmPosition::ArmPosition()
+{
+
+}
+
+
+ArmPosition::ArmPosition(int x, int y, int z)
+{
+	m_x = x;
+	m_y = y;
+	m_z = z;
+}
+
+
+ArmPosition::ArmPosition(const ArmPosition& other)
+{
+	m_x = other.m_x;
+	m_y = other.m_y;
+	m_z = other.m_z;
+}
+
+
+ArmPosition::~ArmPosition()
+{
+
+}
+
+
+ArmPosition& ArmPosition::operator=(const ArmPosition& other)
+{
+	return *this;
+}

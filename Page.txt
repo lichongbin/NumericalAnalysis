@@ -1,0 +1,388 @@
+#pragma once
+
+
+// PropertyCoverDlg
+
+class PropertyCoverDlg : public CMFCPropertyPage
+{
+	DECLARE_DYNAMIC(PropertyCoverDlg)
+
+public:
+	PropertyCoverDlg();
+	virtual ~PropertyCoverDlg();
+
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_PROPPAGE_COVER };
+#endif
+
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+
+
+// PropertyCoverDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "ProjectConfig.h"
+#include "PropertyCoverDlg.h"
+
+
+// PropertyCoverDlg
+
+IMPLEMENT_DYNAMIC(PropertyCoverDlg, CMFCPropertyPage)
+
+PropertyCoverDlg::PropertyCoverDlg()
+	:CMFCPropertyPage(IDD_PROPPAGE_COVER)
+{
+	m_psp.dwFlags &= ~PSP_HASHELP;
+}
+
+PropertyCoverDlg::~PropertyCoverDlg()
+{
+}
+
+
+BEGIN_MESSAGE_MAP(PropertyCoverDlg, CMFCPropertyPage)
+END_MESSAGE_MAP()
+
+
+
+// PropertyCoverDlg 消息处理程序
+
+
+#pragma once
+
+
+// PropertyMixDlg
+
+class PropertyMixDlg : public CMFCPropertyPage
+{
+	DECLARE_DYNAMIC(PropertyMixDlg)
+
+public:
+	PropertyMixDlg();
+	virtual ~PropertyMixDlg();
+
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_PROPPAGE_MIX };
+#endif
+
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+
+
+// PropertyMixDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "ProjectConfig.h"
+#include "PropertyMixDlg.h"
+
+
+// PropertyMixDlg
+
+IMPLEMENT_DYNAMIC(PropertyMixDlg, CMFCPropertyPage)
+
+PropertyMixDlg::PropertyMixDlg()
+	:CMFCPropertyPage(IDD_PROPPAGE_MIX)
+{
+	m_psp.dwFlags &= ~PSP_HASHELP;
+}
+
+PropertyMixDlg::~PropertyMixDlg()
+{
+}
+
+
+BEGIN_MESSAGE_MAP(PropertyMixDlg, CMFCPropertyPage)
+END_MESSAGE_MAP()
+
+
+
+// PropertyMixDlg 消息处理程序
+
+
+#pragma once
+
+
+// PropertyReagentDlg
+
+class PropertyReagentDlg : public CMFCPropertyPage
+{
+	DECLARE_DYNAMIC(PropertyReagentDlg)
+
+public:
+	PropertyReagentDlg();
+	virtual ~PropertyReagentDlg();
+
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_PROPPAGE_REAGENT };
+#endif
+
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+
+// PropertyReagentDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "ProjectConfig.h"
+#include "PropertyReagentDlg.h"
+
+
+// PropertyReagentDlg
+
+IMPLEMENT_DYNAMIC(PropertyReagentDlg, CMFCPropertyPage)
+
+PropertyReagentDlg::PropertyReagentDlg()
+	:CMFCPropertyPage(IDD_PROPPAGE_REAGENT)
+{
+	m_psp.dwFlags &= ~PSP_HASHELP;
+}
+
+PropertyReagentDlg::~PropertyReagentDlg()
+{
+}
+
+
+BEGIN_MESSAGE_MAP(PropertyReagentDlg, CMFCPropertyPage)
+END_MESSAGE_MAP()
+
+
+
+// PropertyReagentDlg 消息处理程序
+
+
+#pragma once
+
+
+// PropertyScanDlg
+
+class PropertyScanDlg : public CMFCPropertyPage
+{
+	DECLARE_DYNAMIC(PropertyScanDlg)
+
+public:
+	PropertyScanDlg();
+	virtual ~PropertyScanDlg();
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
+
+	// 对话框数据
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_PROPPAGE_SCAN};
+#endif
+
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+	CComboBox m_cmbPieceSet;
+	CComboBox m_cmbPiece;
+	int m_nXPos;
+	int m_nYPos;
+	int m_nZPos;
+
+
+	CSpinButtonCtrl m_spinX;
+	CSpinButtonCtrl m_spinY;
+	CSpinButtonCtrl m_spinZ;
+	CEdit m_edx;
+	CEdit m_edy;
+	CEdit m_edz;
+	afx_msg void OnBnClickedButtonBarX();
+	afx_msg void OnBnClickedButtonBarY();
+	afx_msg void OnBnClickedButtonBarZ();
+	afx_msg void OnBnClickedButtonResetBarX();
+	afx_msg void OnBnClickedButtonResetBarY();
+	afx_msg void OnBnClickedButtonResetBarZ();
+	afx_msg void OnBnClickedButtonSaveBarPos();
+};
+
+// PropertyScanDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "ProjectConfig.h"
+#include "PropertyScanDlg.h"
+#include "const.h"
+
+
+// PropertyScanDlg
+
+IMPLEMENT_DYNAMIC(PropertyScanDlg, CMFCPropertyPage)
+
+PropertyScanDlg::PropertyScanDlg()
+	:CMFCPropertyPage(IDD_PROPPAGE_SCAN)
+	, m_nXPos(0)
+	, m_nYPos(0)
+	, m_nZPos(0)
+{
+	m_psp.dwFlags &= ~PSP_HASHELP;
+}
+
+
+PropertyScanDlg::~PropertyScanDlg()
+{
+}
+
+
+void PropertyScanDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CMFCPropertyPage::DoDataExchange(pDX);
+
+	DDX_Control(pDX, IDC_COMBO_PIECE_SET, m_cmbPieceSet);
+	DDX_Control(pDX, IDC_COMBO_PIECE, m_cmbPiece);
+	DDX_Text(pDX, IDC_EDIT_BAR_X, m_nXPos);
+	DDX_Text(pDX, IDC_EDIT_BAR_Y, m_nYPos);
+	DDX_Text(pDX, IDC_EDIT_BAR_Z, m_nZPos);
+	DDX_Control(pDX, IDC_SPIN_BAR_X, m_spinX);
+	DDX_Control(pDX, IDC_SPIN_BAR_Y, m_spinY);
+	DDX_Control(pDX, IDC_SPIN_BAR_Z, m_spinZ);
+	DDX_Control(pDX, IDC_EDIT_BAR_X, m_edx);
+	DDX_Control(pDX, IDC_EDIT_BAR_Y, m_edy);
+	DDX_Control(pDX, IDC_EDIT_BAR_Z, m_edz);
+}
+
+
+BEGIN_MESSAGE_MAP(PropertyScanDlg, CMFCPropertyPage)
+	ON_BN_CLICKED(IDC_BUTTON_BAR_X, &PropertyScanDlg::OnBnClickedButtonBarX)
+	ON_BN_CLICKED(IDC_BUTTON_BAR_Y, &PropertyScanDlg::OnBnClickedButtonBarY)
+	ON_BN_CLICKED(IDC_BUTTON_BAR_Z, &PropertyScanDlg::OnBnClickedButtonBarZ)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_BAR_X, &PropertyScanDlg::OnBnClickedButtonResetBarX)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_BAR_Y, &PropertyScanDlg::OnBnClickedButtonResetBarY)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_BAR_Z, &PropertyScanDlg::OnBnClickedButtonResetBarZ)
+	ON_BN_CLICKED(IDC_BUTTON_SAVE_BAR_POS, &PropertyScanDlg::OnBnClickedButtonSaveBarPos)
+END_MESSAGE_MAP()
+
+
+
+// PropertyScanDlg 消息处理程序
+BOOL PropertyScanDlg::OnInitDialog()
+{
+	CMFCPropertyPage::OnInitDialog();
+
+	for (size_t i = 0; i < PIECE_SET_COUNT; i++)
+	{
+		CString s;
+		s.Format(IDS_PIECE_SET_NO, i + 1);
+		m_cmbPieceSet.AddString(s);
+	}
+
+	for (size_t i = 0; i < PIECE_COUNT; i++)
+	{
+		CString s;
+		s.Format(IDS_PIECE_NO, i + 1);
+		m_cmbPiece.AddString(s);
+	}
+
+	const int LOW = -6000;
+	const int HIGH = 6000;
+	m_spinX.SetRange32(LOW, HIGH);
+	m_spinY.SetRange32(LOW, HIGH);
+	m_spinZ.SetRange32(LOW, HIGH);
+
+	m_spinX.SetBuddy(&m_edx);
+	m_spinY.SetBuddy(&m_edy);
+	m_spinZ.SetBuddy(&m_edz);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+				  // 异常: OCX 属性页应返回 FALSE
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonBarX()
+{
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonBarY()
+{
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonBarZ()
+{
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonResetBarX()
+{
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonResetBarY()
+{
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonResetBarZ()
+{
+}
+
+
+void PropertyScanDlg::OnBnClickedButtonSaveBarPos()
+{
+}
+
+
+#pragma once
+
+
+// PropertyWashDlg
+
+class PropertyWashDlg : public CMFCPropertyPage
+{
+	DECLARE_DYNAMIC(PropertyWashDlg)
+
+public:
+	PropertyWashDlg();
+	virtual ~PropertyWashDlg();
+
+	// 对话框数据
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_PROPPAGE_WASH };
+#endif
+
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+
+// PropertyWashDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "ProjectConfig.h"
+#include "PropertyWashDlg.h"
+
+
+// PropertyWashDlg
+
+IMPLEMENT_DYNAMIC(PropertyWashDlg, CMFCPropertyPage)
+
+PropertyWashDlg::PropertyWashDlg()
+	:CMFCPropertyPage(IDD_PROPPAGE_WASH)
+{
+	m_psp.dwFlags &= ~PSP_HASHELP;
+}
+
+PropertyWashDlg::~PropertyWashDlg()
+{
+}
+
+
+BEGIN_MESSAGE_MAP(PropertyWashDlg, CMFCPropertyPage)
+END_MESSAGE_MAP()
+
+
+// PropertyWashDlg 消息处理程序
+
+

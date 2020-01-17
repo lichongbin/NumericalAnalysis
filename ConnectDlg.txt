@@ -1,0 +1,189 @@
+#pragma once
+
+
+// ConnectDlg 对话框
+
+class ConnectDlg : public CDialogEx
+{
+	DECLARE_DYNAMIC(ConnectDlg)
+
+public:
+	ConnectDlg(CWnd* pParent = nullptr);   // 标准构造函数
+	virtual ~ConnectDlg();
+
+// 对话框数据
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_DIALOG_CONNECT };
+#endif
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCancel();
+	afx_msg LRESULT OnConnected(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	CIPAddressCtrl m_ip;
+	CEdit m_port;
+	CButton m_btnOK;
+	CButton m_btnCancel;
+	UINT_PTR m_nTimer;
+};
+
+
+// ConnectDlg.cpp: 实现文件
+//
+
+#include "pch.h"
+#include "ProjectConfig.h"
+#include "ConnectDlg.h"
+#include "afxdialogex.h"
+#include "const.h"
+#include "Settings.h"
+#include "UserMsg.h"
+#include "DeviceCom.h"
+
+
+// ConnectDlg 对话框
+
+IMPLEMENT_DYNAMIC(ConnectDlg, CDialogEx)
+
+ConnectDlg::ConnectDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_DIALOG_CONNECT, pParent)
+{
+
+}
+
+ConnectDlg::~ConnectDlg()
+{
+}
+
+void ConnectDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_IPADDRESS_SERVER, m_ip);
+	DDX_Control(pDX, IDC_EDIT_PORT, m_port);
+	DDX_Control(pDX, IDOK, m_btnOK);
+	DDX_Control(pDX, IDCANCEL, m_btnCancel);
+}
+
+
+BEGIN_MESSAGE_MAP(ConnectDlg, CDialogEx)
+	ON_BN_CLICKED(IDOK, &ConnectDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &ConnectDlg::OnBnClickedCancel)
+	ON_MESSAGE(WM_CONNECT, &ConnectDlg::OnConnected)
+	ON_WM_TIMER()
+END_MESSAGE_MAP()
+
+
+// ConnectDlg 消息处理程序
+BOOL ConnectDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	Settings s;
+	m_ip.SetAddress(s.m_dwIP);
+	
+	CString sp;
+	sp.Format(_T("%d"), s.m_nPort);
+	m_port.SetWindowText(sp);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+				  // 异常: OCX 属性页应返回 FALSE
+}
+
+
+void ConnectDlg::OnBnClickedOk()
+{
+	CDialogEx::OnOK();
+	return;
+
+	if (m_ip.IsBlank())
+	{
+		return;
+	}
+
+	DeviceCom* pc = GetDeviceCom();
+	if (nullptr == pc)
+	{
+		return;
+	}
+
+	DWORD ip;
+	m_ip.GetAddress(ip);
+
+	CString str;
+	m_port.GetWindowText(str);
+	int port = _ttoi(str);
+
+	Settings s;
+	s.m_dwIP = ip;
+	s.m_nPort = port;
+	s.Save();
+
+	pc->SetWnd(this);
+
+#ifdef DEBUG
+	m_nTimer = SetTimer(1001, 30000, NULL);
+#else
+	m_nTimer = SetTimer(1001, 3000, NULL);
+#endif // DEBUG
+
+	if (pc->Connect(ip, port))
+	{
+		m_btnOK.EnableWindow(FALSE);
+	}
+}
+
+
+void ConnectDlg::OnBnClickedCancel()
+{
+	CDialogEx::OnCancel();
+}
+
+
+LRESULT ConnectDlg::OnConnected(WPARAM wParam, LPARAM lParam)
+{
+	DeviceCom* pc = GetDeviceCom();
+	if (nullptr == pc)
+	{
+		return 0;
+	}
+	pc->OnConnect();
+
+	if (wParam == 0)
+	{
+		CDialogEx::OnOK();
+	}
+	else
+	{
+		AfxMessageBox(IDS_CONNECT_FAILED);
+		m_btnOK.EnableWindow(TRUE);
+	}
+	return 0;
+}
+
+
+void ConnectDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == m_nTimer)
+	{
+		KillTimer(m_nTimer);
+
+		DeviceCom* pc = GetDeviceCom();
+		if (nullptr == pc)
+		{
+			return;
+		}
+		pc->OnConnect();
+
+		AfxMessageBox(IDS_CONNECT_FAILED);
+		m_btnOK.EnableWindow(TRUE);
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
+}
